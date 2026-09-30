@@ -1,10 +1,10 @@
-# Container GUI
+# Apple Container
 
 Apple `container` 的图形界面（原生 macOS SwiftUI 应用）。不想敲命令行时，用它管理容器。
 
 ## 安装位置
 
-- 应用：`/Applications/Container GUI.app`（已安装，可从启动台/聚焦搜索打开）
+- 应用：`/Applications/Apple Container.app`（已安装，可从启动台/聚焦搜索打开）
 - 源码：`~/DeepSeek Harness/apple-container-gui/`
 
 ## 功能
@@ -126,8 +126,8 @@ cd ~/DeepSeek\ Harness/apple-container-gui
 构建完成后如需更新已安装的版本：
 
 ```bash
-rm -rf "/Applications/Container GUI.app"
-cp -R "build/Container GUI.app" /Applications/
+rm -rf "/Applications/Apple Container.app"
+cp -R "build/Apple Container.app" /Applications/
 ```
 
 ## 实现说明
