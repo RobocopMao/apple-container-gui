@@ -7,7 +7,7 @@
     <key>CFBundleDisplayName</key>
     <string>Apple Container</string>
     <key>CFBundleExecutable</key>
-    <string>ContainerGUI</string>
+    <string>AppleContainer</string>
     <key>CFBundleIdentifier</key>
     <string>local.containergui.app</string>
     <key>CFBundleInfoDictionaryVersion</key>

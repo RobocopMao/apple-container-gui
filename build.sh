@@ -9,7 +9,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 APP_NAME="Apple Container"
-EXEC_NAME="ContainerGUI"
+EXEC_NAME="AppleContainer"
 BUILD_DIR="$ROOT/build"
 APP_DIR="$BUILD_DIR/$APP_NAME.app"
 MODULE_CACHE="$BUILD_DIR/modulecache"
