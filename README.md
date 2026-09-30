@@ -4,8 +4,8 @@ Apple `container` 的图形界面（原生 macOS SwiftUI 应用）。不想敲�
 
 ## 安装位置
 
-- 应用：`/Applications/Apple Container.app`（已安装，可从启动台/聚焦搜索打开）
-- 源码：`~/DeepSeek Harness/apple-container-gui/`
+- 应用：安装到 `/Applications/Apple Container.app`（可从启动台/聚焦搜索打开）
+- 源码：本仓库根目录
 
 ## 功能
 
@@ -62,7 +62,7 @@ Apple container **没有**修改已建容器的命令（无 `update`/`edit`/`set
 
 原因是拉取多平台镜像时，Apple container 会把**所有架构都解包落盘**（拉取日志里能看到
 `Unpacking image for platform linux/s390x` 之类）。所以像 `node:12-alpine` 这种 6 平台镜像
-会占约 7 GB，而本机其实只用得到 arm64。
+会占约 7 GB，而实际只用得到 arm64。
 
 清理弹窗会**逐项列出**：名称、说明（几个仓库名 / 几个平台）、磁盘真实占用，
 正在被容器使用的标绿「使用中」且不可勾选。默认勾选可清理的镜像项，点清理会先弹确认框。
@@ -113,13 +113,14 @@ xcrun actool AppIcon.icon --compile <out> --platform macosx \
 
 ## 重新构建
 
+在本仓库根目录执行：
+
 ```bash
-cd ~/DeepSeek\ Harness/apple-container-gui
 ./build.sh
 ```
 
 构建脚本会自动用 Xcode-beta 的工具链并显式加载 SwiftUI 宏插件
-（本机只有 CommandLineTools，其编译器与 SDK 版本不匹配，且
+（若系统只装了 CommandLineTools，其编译器与 SDK 版本不匹配，且
 `libSwiftUIMacros.dylib` 位于 Platform 目录而非 toolchain 目录，
 不加载会报 `external macro implementation type 'SwiftUIMacros.StateMacro' could not be found`）。
 
