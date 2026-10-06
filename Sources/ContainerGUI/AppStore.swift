@@ -111,7 +111,7 @@ final class AppStore: ObservableObject {
 
     /// 主窗口是否开着。菜单栏图标一直在，刷新节奏按它分档。
     var isMainWindowVisible: Bool {
-        NSApp.windows.contains { $0.isVisible && $0.canBecomeMain }
+        MainWindow.isVisible
     }
 
     func restartRefreshTimer() {

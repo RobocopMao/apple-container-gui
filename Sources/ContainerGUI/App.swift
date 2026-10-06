@@ -17,6 +17,7 @@ struct ContainerGUIApp: App {
                 .environmentObject(store)
                 .frame(minWidth: 1000, minHeight: 640)
                 .background(WindowAccessor())
+                .background(OpenWindowRegistrar())
                 .onAppear { NSApp.activate(ignoringOtherApps: true) }
         }
         .windowToolbarStyle(.unified(showsTitle: true))
@@ -28,15 +29,9 @@ struct ContainerGUIApp: App {
             }
         }
 
-        // 状态栏图标：常驻菜单栏。主窗口关掉后它还在，容器和服务都继续跑。
-        MenuBarExtra {
-            MenuBarContent()
-                .environmentObject(store)
-        } label: {
-            MenuBarLabel()
-                .environmentObject(store)
-        }
-        .menuBarExtraStyle(.menu)
+        // 菜单栏图标由 AppKit 的 StatusItemController 管理（见 StatusItemController.swift）。
+        // 这里不能用 SwiftUI 的 MenuBarExtra：它的点击类型由系统接管，
+        // 左右键都弹同一个菜单，无法实现「左键开主界面、右键弹菜单」。
 
         Settings {
             SettingsView()
@@ -55,6 +50,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         AppStore.shared.start()
+        // 菜单栏图标自己接管左右键：左键开主界面，右键弹菜单
+        StatusItemController.shared.install()
     }
 
     /// 关掉主窗口只收窗口，不退出应用 —— 菜单栏图标和服务都继续留着。
