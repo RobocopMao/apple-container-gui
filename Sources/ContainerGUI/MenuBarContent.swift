@@ -12,7 +12,7 @@ struct MenuBarLabel: View {
 
     var body: some View {
         HStack(spacing: 3) {
-            Image(nsImage: CubeGlyph.image(filled: isActive))
+            Image(nsImage: CubeGlyph.menuBarImage(active: isActive))
             if store.runningContainers.count > 0 {
                 Text("\(store.runningContainers.count)")
             }
