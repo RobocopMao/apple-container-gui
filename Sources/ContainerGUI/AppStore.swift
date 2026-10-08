@@ -82,8 +82,6 @@ final class AppStore: ObservableObject {
     @Published var showStopped = true
     @Published var autoRefresh = true
     @Published var refreshInterval: Double = 3.0
-    /// 是否在程序坞显示图标（跟随上次的选择）
-    @Published var showDockIcon: Bool = DockIconPreference.isVisible
 
     private var started = false
 
@@ -141,12 +139,6 @@ final class AppStore: ObservableObject {
         guard !isBusy else { return }
         if !isMainWindowVisible, let last = lastRefresh, Date().timeIntervalSince(last) < 10 { return }
         Task { await refreshAll(silent: true) }
-    }
-
-    func setShowDockIcon(_ visible: Bool) {
-        showDockIcon = visible
-        DockIconPreference.store(visible)
-        DockIconPreference.apply(visible)
     }
 
     func setAutoRefresh(_ on: Bool) {

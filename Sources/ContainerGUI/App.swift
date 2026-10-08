@@ -18,7 +18,13 @@ struct ContainerGUIApp: App {
                 .frame(minWidth: 1000, minHeight: 640)
                 .background(WindowAccessor())
                 .background(OpenWindowRegistrar())
-                .onAppear { NSApp.activate(ignoringOtherApps: true) }
+                .onAppear {
+                    // 先把程序坞图标切回来（有窗口 → .regular），再激活。
+                    // 顺序不能反：以 .accessory 激活的话第一帧仍是「非激活外观」，
+                    // 用户会看到窗口打开时闪一下。
+                    DockIconPolicy.windowWillAppear()
+                    NSApp.activate(ignoringOtherApps: true)
+                }
         }
         .windowToolbarStyle(.unified(showsTitle: true))
         .commands {
@@ -43,9 +49,12 @@ struct ContainerGUIApp: App {
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    /// 程序坞图标要尽早定下来，放 didFinishLaunching 会闪一下
     func applicationWillFinishLaunching(_ notification: Notification) {
-        DockIconPreference.apply()
+        // 程序坞图标改成跟着窗口走：有窗口就 .regular、窗口全关就 .accessory。
+        // 装在这里是为了尽早开始监听窗口的出现；install() 内部只是**延后一轮**核对，
+        // 不会当场判定 —— 此刻窗口还没建出来，当场判定会得出「没窗口」而错误地收起图标
+        // （DockIconPolicy 另有一条兜底：本次运行还没见过窗口之前一律保持 .regular）。
+        DockIconPolicy.install()
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {

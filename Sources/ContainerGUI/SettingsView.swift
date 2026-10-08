@@ -37,11 +37,7 @@ struct SettingsView: View {
             }
 
             Section {
-                Toggle("在程序坞中显示图标", isOn: Binding(
-                    get: { store.showDockIcon },
-                    set: { store.setShowDockIcon($0) }
-                ))
-                Text("关掉后只保留菜单栏图标。主窗口和后台服务都不受影响；关掉主窗口，服务也照常运行。")
+                Text("程序坞图标跟着窗口走：主窗口开着就显示（也能用 Cmd+Tab 切过去），主窗口关掉后自动收起，只剩菜单栏图标。后台服务不受影响。")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } header: {
