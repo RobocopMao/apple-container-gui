@@ -130,7 +130,7 @@ struct TaskToast: View {
 
                 if t.finished && !store.isBusy {
                     Button {
-                        withAnimation { store.taskStatus = nil }
+                        store.dismissTaskStatus()
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundStyle(.tertiary)

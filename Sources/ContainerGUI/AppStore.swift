@@ -61,8 +61,22 @@ final class AppStore: ObservableObject {
     @Published var isLoading = false
     @Published var lastRefresh: Date?
     @Published var errorBanner: String?
-    @Published var taskStatus: TaskStatus?
+
+    /// 底部操作提示。完成后自动消失，不需要手动点关闭。
+    /// didSet 让所有赋值点（启动/停止/创建/拉取/清理…）都自动带上自动消隐，
+    /// 不用在每个操作里各写一遍。
+    @Published var taskStatus: TaskStatus? {
+        didSet { scheduleToastAutoHide() }
+    }
+
     @Published var isBusy = false
+
+    /// 操作完成的提示停留多久后自动消失
+    static let toastAutoHideDelay: TimeInterval = 3.0
+    /// 提示代数：每次赋值 +1。延迟到点的闭包只认自己那一代，
+    /// 避免「上一条提示的定时器」把下一条提示提前关掉。
+    private var toastGeneration = 0
+    private var toastHideWork: DispatchWorkItem?
 
     // 设置
     @Published var showStopped = true
@@ -138,6 +152,48 @@ final class AppStore: ObservableObject {
     func setAutoRefresh(_ on: Bool) {
         autoRefresh = on
         restartRefreshTimer()
+    }
+
+    // MARK: - 提示自动消隐
+
+    /// 操作完成后把底部提示收掉。
+    /// - 只有 finished 的提示才排定消隐；进行中的提示要一直留着（那时还带转圈）。
+    /// - 每次赋值都换一代，旧定时器作废，所以「连续操作」不会把新提示提前关掉。
+    /// - 完成与失败一视同仁，都是 3 秒；失败详情另有 alert 兜底，不会因为提示消失就丢掉。
+    private func scheduleToastAutoHide() {
+        toastHideWork?.cancel()
+        toastHideWork = nil
+        toastGeneration += 1
+        guard let t = taskStatus, t.finished else { return }
+
+        let generation = toastGeneration
+        let work = DispatchWorkItem { [weak self] in
+            Task { @MainActor in
+                guard let self else { return }
+                // 只认自己那一代：期间若又有新提示（含新操作开始），说明已经换了内容，不许关。
+                // 不必再看 isBusy —— 每个会置 isBusy 的操作都会同时改 taskStatus，代数必然变。
+                guard self.toastGeneration == generation else { return }
+                self.toastStatusPhaseOut()
+            }
+        }
+        toastHideWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.toastAutoHideDelay, execute: work)
+    }
+
+    private func toastStatusPhaseOut() {
+        toastHideWork?.cancel()
+        toastHideWork = nil
+        toastGeneration += 1   // 让在途的旧定时器彻底失效
+        // 提示条自身的 .animation 随提示一起被移除，这里必须显式开事务，
+        // 否则程序化消失会「啪」地闪掉、没有下滑淡出。
+        withAnimation(.easeInOut(duration: 0.2)) {
+            taskStatus = nil
+        }
+    }
+
+    /// 手动关闭提示（右上角的 ×），同时作废待执行的自动消隐
+    func dismissTaskStatus() {
+        toastStatusPhaseOut()
     }
 
     // MARK: - 刷新
